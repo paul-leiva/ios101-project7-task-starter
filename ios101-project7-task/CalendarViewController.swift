@@ -86,7 +86,7 @@ class CalendarViewController: UIViewController {
         // ---
 
         // 1.
-        tasks = Task.getTasks()
+        tasks = Task.getTasks(forKey: Task.existingsTasksKey)
         // 2.
         let todayComponents = Calendar.current.dateComponents([.year, .month, .weekOfMonth, .day], from: Date())
         // 3.
@@ -144,7 +144,7 @@ class CalendarViewController: UIViewController {
     // 8. Reload the table view with animation.
     private func refreshTasks() {
         // 1.
-        tasks = Task.getTasks()
+        tasks = Task.getTasks(forKey: Task.existingsTasksKey)
         // 2.
         tasks.sort { lhs, rhs in
             if lhs.isComplete && rhs.isComplete {

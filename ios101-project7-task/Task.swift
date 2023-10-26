@@ -5,7 +5,7 @@
 import UIKit
 
 // The Task model
-struct Task {
+struct Task: Codable, Equatable {
 
     // The task's title
     var title: String
@@ -54,23 +54,66 @@ struct Task {
 extension Task {
 
 
+    // Existing tasks key used to access existing tasks from UserDefaults
+    static var existingsTasksKey: String {
+        return "existingsTasks"
+    }
+    
     // Given an array of tasks, encodes them to data and saves to UserDefaults.
-    static func save(_ tasks: [Task]) {
+    static func save(_ tasks: [Task], forKey key: String) {
 
         // TODO: Save the array of tasks
+        
+        // 1. Create an instance of UserDefaults
+        let defaults = UserDefaults.standard
+        
+        // 2. Encode the array of `Task` objects to `Data`
+        let encodedData = try! JSONEncoder().encode(tasks)
+        
+        // 3. Save the encoded `Data` to User defaults with a key
+        defaults.set(encodedData, forKey: key)
     }
 
     // Retrieve an array of saved tasks from UserDefaults.
-    static func getTasks() -> [Task] {
+    static func getTasks(forKey key: String) -> [Task] {
         
         // TODO: Get the array of saved tasks from UserDefaults
-
-        return [] // 👈 replace with returned saved tasks
+        
+        // 1. Create an instance of UserDefaults
+        let defaults = UserDefaults.standard
+        
+        // 2. Get any pre-existing task `Data` saved to UserDefaults (if any exist)
+        if let data = defaults.data(forKey: existingsTasksKey) {
+            // 3. Try to decode the task `Data` to `Task` objects
+            let decodedTasks = try! JSONDecoder().decode([Task].self, from: data)
+            
+            // 4. If the data is retrieved from UserDefaults and successfully decoded, return array of Tasks
+            return decodedTasks // return saved tasks
+        }
+        else {
+            return [] // 👈 replace with returned saved tasks
+        }
     }
 
     // Add a new task or update an existing task with the current task.
     func save() {
 
         // TODO: Save the current task
+        
+        // 1. Get all existing tasks from UserDefaults
+        var existingsTasks = Task.getTasks(forKey: Task.existingsTasksKey)
+        
+        // 2. Add the task to the Tasks array
+        // Check if the current tasks already exists in the `tasks` array
+        if (existingsTasks.first == self) { // if the current tasks already exists
+            existingsTasks.remove(at: 0) // Remove it from the existing tasks
+            existingsTasks.insert(self, at: 0) // Replace at same index with updated task
+        }
+        else { // if no matching tasks already exists, add to end of the `tasks` array
+            existingsTasks.append(self)
+        }
+        
+        // 3. Save the updated Tasks array
+        Task.save(existingsTasks, forKey: Task.existingsTasksKey)
     }
 }

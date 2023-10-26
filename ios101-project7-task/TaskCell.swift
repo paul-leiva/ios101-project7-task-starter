@@ -28,6 +28,13 @@ class TaskCell: UITableViewCell {
         update(with: task)
         // 3.
         onCompleteButtonTapped?(task)
+        
+        var updatedTasks: [Task] = Task.getTasks(forKey: Task.existingsTasksKey)
+        
+        print("Tasks: ")
+        for uT in updatedTasks {
+            print(uT.title)
+        }
     }
 
     // Initial configuration of the task cell
