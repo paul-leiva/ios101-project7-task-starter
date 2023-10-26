@@ -15,6 +15,8 @@ struct Task: Codable, Equatable {
 
     // The due date by which the task should be completed
     var dueDate: Date
+    
+    var id: String
 
     // Initialize a new task
     // `note` and `dueDate` properties have default values provided if none are passed into the init by the caller.
@@ -22,6 +24,7 @@ struct Task: Codable, Equatable {
         self.title = title
         self.note = note
         self.dueDate = dueDate
+        self.id = UUID().uuidString
     }
 
     // A boolean to determine if the task has been completed. Defaults to `false`
@@ -47,7 +50,7 @@ struct Task: Codable, Equatable {
     let createdDate: Date = Date()
 
     // An id (Universal Unique Identifier) used to identify a task.
-    let id: String = UUID().uuidString
+    //let id: String = UUID().uuidString
 }
 
 // MARK: - Task + UserDefaults
@@ -99,15 +102,27 @@ extension Task {
     func save() {
 
         // TODO: Save the current task
+        print(" Task.save() function called")
         
         // 1. Get all existing tasks from UserDefaults
         var existingsTasks = Task.getTasks(forKey: Task.existingsTasksKey)
         
         // 2. Add the task to the Tasks array
         // Check if the current tasks already exists in the `tasks` array
-        if (existingsTasks.first == self) { // if the current tasks already exists
-            existingsTasks.remove(at: 0) // Remove it from the existing tasks
-            existingsTasks.insert(self, at: 0) // Replace at same index with updated task
+        //let if index = existingsTasks.firstIndex(of: self)
+        print("self: \(self)")
+        print("\n")
+        for task in existingsTasks {
+            print(task, "\n\n")
+        }
+        
+        if (existingsTasks.filter{ $0.id == self.id }.count != 0) {
+            guard let taskToUpdate = existingsTasks.filter({ $0.id == self.id }).first else { return }
+            let index = existingsTasks.firstIndex(of: taskToUpdate)!
+            print("tasks[] size: \(existingsTasks.count)")
+            existingsTasks.remove(at: index)
+            print("tasks[] size: \(existingsTasks.count)")
+            existingsTasks.insert(self, at: index)
         }
         else { // if no matching tasks already exists, add to end of the `tasks` array
             existingsTasks.append(self)
