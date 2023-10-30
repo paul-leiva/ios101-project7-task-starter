@@ -86,7 +86,7 @@ extension Task {
         let defaults = UserDefaults.standard
         
         // 2. Get any pre-existing task `Data` saved to UserDefaults (if any exist)
-        if let data = defaults.data(forKey: existingsTasksKey) {
+        if let data = defaults.data(forKey: key) {
             // 3. Try to decode the task `Data` to `Task` objects
             let decodedTasks = try! JSONDecoder().decode([Task].self, from: data)
             
@@ -124,7 +124,7 @@ extension Task {
             print("tasks[] size: \(existingsTasks.count)")
             existingsTasks.insert(self, at: index)
         }
-        else { // if no matching tasks already exists, add to end of the `tasks` array
+        else { // if no matching task already exists, add to end of the `tasks` array
             existingsTasks.append(self)
         }
         
